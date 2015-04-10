@@ -28,14 +28,12 @@ class res_users(models.Model):
         
         params = werkzeug.url_encode (data)
         req = urllib2.Request (endpoint, params)
-        _logger.info ("POSTing to %s", req.get_full_url ())
         try:
             f = urllib2.urlopen (req)
         except Exception, e:
-            _logger.info ("\n\tError [%s]", e.read())
+            _logger.exception ("\n\tError [%s]", e.read())
             raise e
         response = f.read()
-        _logger.info ("\n\tResponse: %s", response)
 
         return simplejson.loads(response)
 
@@ -48,15 +46,12 @@ class res_users(models.Model):
         else:
             req = endpoint + '?' + params
         
-        _logger.info ("GETing to %s", req)
         try:
             f = urllib2.urlopen (req)
         except Exception, e:
-            _logger.info ("\n\tError [%s]", e.read())
+            _logger.exception ("\n\tError [%s]", e.read())
             raise e
         response = f.read()
-
-        _logger.info ("\n\tResponse: %s", response)
 
         return simplejson.loads(response)
 
@@ -90,7 +85,6 @@ class res_users(models.Model):
     def _cenit_auth_oauth_code_validate (self, cr, uid, provider, code, context=None):
         """ return the validation data corresponding to the access token """
         
-        _logger.info ("Requesting provider")
         p = self.__get_oauth_provider (cr, uid, provider, context=context)
         params = {
             'grant_type': 'authorization_code',
@@ -100,7 +94,6 @@ class res_users(models.Model):
             'redirect_uri': request.httprequest.url_root + p.return_url,
         }
 
-        _logger.info ("Requesting access token")
         validation = self.__cenit_auth_oauth_validation (cr, uid, p.validation_endpoint, params)
         access_token = validation.get('access_token', False)
 
@@ -179,7 +172,6 @@ class res_users(models.Model):
     def __cenit_get_credentials (self, cr, uid, provider, validation, params, context=None):
         """ passes validation result to get login credentials """
         
-        _logger.info ("\n\tValidation: %s", validation)
         # required check
         if not validation.get('user_id'):
             raise openerp.exceptions.AccessDenied()
@@ -200,12 +192,10 @@ class res_users(models.Model):
         
         (dbname, login) = self.__cenit_get_credentials (cr, uid, provider, validation, params, context=context)
 
-        _logger.info ("\n\tCredentials: %s@%s", login, dbname)
         return (dbname, login, access_token)
 
     def cenit_auth_oauth_code(self, cr, uid, provider, params, context=None):
         code = params.get('code')
-        _logger.info ("Attempting to validate code")
         validation = self._cenit_auth_oauth_code_validate(cr, uid, provider, code)
 
         access_token = validation.get('access_token')

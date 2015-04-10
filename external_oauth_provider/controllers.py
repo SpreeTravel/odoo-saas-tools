@@ -67,11 +67,8 @@ class ExternalOAuthController (http.Controller):
         registry = RegistryManager.get(dbname)
         with registry.cursor() as cr:
             try:
-                _logger.info ("Accessing users")
                 u = registry.get('res.users')
-                _logger.info ("Requesting credentials")
                 credentials = u.cenit_auth_oauth_code (cr, SUPERUSER_ID, provider, kw, context=context)
-                _logger.info ("Credentials: %s", credentials)
                 cr.commit()
                 action = state.get('a')
                 menu = state.get('m')
@@ -127,7 +124,6 @@ class ExternalOAuthController (http.Controller):
         }
 
         kw['state'] = simplejson.dumps (state)
-        _logger.info ("\n\tKW: %s", kw)
         return self.cenit_signin(**kw)
 
 
@@ -143,7 +139,6 @@ class AuthSignupHome (Home):
             try:
                 u = registry.get('res.users')
                 credentials = u.cenit_auth_oauth_password (cr, SUPERUSER_ID, provider, kw, context=context)
-                _logger.info ("Credentials: %s", credentials)
                 cr.commit()
                 action = state.get('a')
                 menu = state.get('m')
@@ -193,11 +188,10 @@ class AuthSignupHome (Home):
                     'c': {'no_user_creation': True},
                 })
             except Exception, e:
-                _logger.info ("\n\tException ocurred: [%s]", e)
+                _logger.exception ("\n\tException ocurred: [%s]", e)
                 return super(AuthSignupHome, self).web_login(redirect, **kw)
 
             kw.update ({'state': simplejson.dumps (state)})
-            _logger.info ("\n\tKW: %s", kw)
             return self.__login (kw)
         else:    
             return super(AuthSignupHome, self).web_login(redirect, **kw)
