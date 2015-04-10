@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="view_saas_oauth_provider_form" model="ir.ui.view">
+            <field name="name">saas.auth.oauth.provider.form</field>
+            <field name="model">auth.oauth.provider</field>
+            <field name="inherit_id" ref="auth_oauth.view_oauth_provider_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/sheet/group/field[@name='data_endpoint']" position="after">
+                  <field name="return_url" string="Return URL"/>
+                  <field name="response_type" string="Response Type"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>
