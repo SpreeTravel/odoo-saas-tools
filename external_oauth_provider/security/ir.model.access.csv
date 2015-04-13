@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_external_oauth_provider_external_oauth_provider,external_oauth_provider.external_oauth_provider,model_external_oauth_provider_external_oauth_provider,,1,0,0,0
