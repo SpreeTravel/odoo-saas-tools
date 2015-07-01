@@ -1,5 +1,6 @@
 import os
 import openerp
+from ast import literal_eval
 from openerp import SUPERUSER_ID
 from openerp import models, fields
 from openerp.tools import config
@@ -37,6 +38,9 @@ class SaasServerPlan(models.Model):
                                            id1='company_id', id2='module_id',
                                            string='Optional Addons')
     client_ids = fields.One2many('saas_server.client', 'plan_id', 'Clients')
+    
+    automatic_tenant = fields.Boolean('Automatic Tenant', default=True)
+    template_user = fields.Many2one('res.users', 'Template User')
 
     _order = 'sequence'
 
@@ -152,3 +156,34 @@ class ResUsers(models.Model):
     plan_id = fields.Many2one('saas_server.plan', 'Plan')
     organization = fields.Char('Organization', size=64)
     database = fields.Char('Database', size=64)
+    
+    def _signup_create_user(self, cr, uid, values, context=None):
+        ir_config_parameter = self.pool.get('ir.config_parameter')
+        
+        """ create a new user from the template user """
+        template_user_id = False
+        if values.get('plan_id'):
+            plan = self.pool.get('saas_server.plan').browse(cr, uid, int(values['plan_id']))
+            template_user_id = plan.template_user and plan.template_user.id or False
+
+        if not template_user_id:
+            template_user_id = literal_eval(ir_config_parameter.get_param(cr, uid, 'auth_signup.template_user_id', 'False'))
+            assert template_user_id and self.exists(cr, uid, template_user_id, context=context), 'Signup: invalid template user'
+
+        # check that uninvited users may sign up
+        if 'partner_id' not in values:
+            if not literal_eval(ir_config_parameter.get_param(cr, uid, 'auth_signup.allow_uninvited', 'False')):
+                raise SignupError('Signup is not allowed for uninvited users')
+
+        assert values.get('login'), "Signup: no login given for new user"
+        assert values.get('partner_id') or values.get('name'), "Signup: no name or partner given for new user"
+
+        # create a copy of the template user (attached to a specific partner_id if given)
+        values['active'] = True
+        context = dict(context or {}, no_reset_password=True)
+        try:
+            with cr.savepoint():
+                return self.copy(cr, uid, template_user_id, values, context=context)
+        except Exception, e:
+            # copy may failed if asked login is not available.
+            raise SignupError(ustr(e))

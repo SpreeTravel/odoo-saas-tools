@@ -82,13 +82,20 @@ class OAuthLogin(oauth.OAuthLogin):
             data = user.search_read(request.cr, SUPERUSER_ID, domain, fields)
             if data and data[0]['share'] and data[0]['database']:
                 kw['redirect'] = '/saas_server/tenant'
+            elif data and data[0]['share']:
+                kw['redirect'] = '/shop'
         return super(OAuthLogin, self).web_login(*args, **kw)
 
     @http.route()
     def web_auth_signup(self, *args, **kw):
-        if kw.get('dbname', False):
-            redirect = '/saas_portal/book_then_signup'
-            kw['redirect'] = '%s?dbname=%s' % (redirect, kw['dbname'])
+        if kw.get('dbname', False) and kw.get('plan_id', False):
+            plan_obj = request.registry.get('saas_server.plan')
+            plan = plan_obj.browse(request.cr, SUPERUSER_ID, int(kw['plan_id']))
+            if plan.automatic_tenant:
+                redirect = '/saas_portal/book_then_signup'
+                kw['redirect'] = '%s?dbname=%s' % (redirect, kw['dbname'])
+            else:
+                kw['redirect'] = '/seller/add_product'
         return super(OAuthLogin, self).web_auth_signup(*args, **kw)
 
     @http.route()

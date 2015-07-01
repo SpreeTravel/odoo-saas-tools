@@ -119,6 +119,8 @@ class SaasServer(http.Controller):
                                                         SUPERUSER_ID,
                                                         request.uid)
         db = user.database
+        if not db:
+            return werkzeug.utils.redirect('/shop')
         registry = openerp.modules.registry.RegistryManager.get(db)
         with registry.cursor() as cr:
             to_search = [('login', '=', user.login)]
