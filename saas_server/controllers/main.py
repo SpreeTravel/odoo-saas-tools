@@ -120,7 +120,17 @@ class SaasServer(http.Controller):
                                                         request.uid)
         db = user.database
         if not db:
-            return werkzeug.utils.redirect('/shop')
+            params = {
+                'plan_id': user.plan_id,
+                'name': user.name,
+                'organization': user.organization,
+                'login': user.login,
+                'dbname': user.subdomain
+            }
+            scheme = request.httprequest.scheme
+            domain = request.httprequest.host
+            params = werkzeug.url_encode(params)
+            return werkzeug.utils.redirect('{scheme}://{domain}/saas_portal/book_then_signup?{params}'.format(scheme=scheme, domain=domain, params=params))
         registry = openerp.modules.registry.RegistryManager.get(db)
         with registry.cursor() as cr:
             to_search = [('login', '=', user.login)]
@@ -206,6 +216,8 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             values['plan_id'] = qcontext['plan_id']
         if qcontext.get('organization', False):
             values['organization'] = qcontext['organization']
+        if qcontext.get('dbname', False):
+            values['subdomain'] = qcontext['dbname']
         if qcontext.get('country_id', False):
             values['country_id'] = qcontext['country_id']
         if qcontext.get('dbname', False):

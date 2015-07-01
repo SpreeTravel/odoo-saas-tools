@@ -156,6 +156,7 @@ class ResUsers(models.Model):
     plan_id = fields.Many2one('saas_server.plan', 'Plan')
     organization = fields.Char('Organization', size=64)
     database = fields.Char('Database', size=64)
+    subdomain = fields.Char('Subdomain')
     
     def _signup_create_user(self, cr, uid, values, context=None):
         ir_config_parameter = self.pool.get('ir.config_parameter')

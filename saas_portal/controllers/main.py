@@ -83,7 +83,7 @@ class OAuthLogin(oauth.OAuthLogin):
             if data and data[0]['share'] and data[0]['database']:
                 kw['redirect'] = '/saas_server/tenant'
             elif data and data[0]['share']:
-                kw['redirect'] = '/shop'
+                kw['redirect'] = '/seller/products'
         return super(OAuthLogin, self).web_login(*args, **kw)
 
     @http.route()
