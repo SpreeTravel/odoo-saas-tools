@@ -220,6 +220,8 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             values['subdomain'] = qcontext['dbname']
         if qcontext.get('country_id', False):
             values['country_id'] = qcontext['country_id']
+        if qcontext.get('city', False):
+            values['city'] = qcontext['city']
         if qcontext.get('dbname', False):
             f_dbname = '%s.%s' % (qcontext['dbname'], self.get_saas_domain())
             full_dbname = f_dbname.replace('www.', '').replace('.', '_')
