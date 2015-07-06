@@ -82,8 +82,6 @@ class OAuthLogin(oauth.OAuthLogin):
             data = user.search_read(request.cr, SUPERUSER_ID, domain, fields)
             if data and data[0]['share'] and data[0]['database']:
                 kw['redirect'] = '/saas_server/tenant'
-            elif data and data[0]['share']:
-                kw['redirect'] = '/seller/products'
         return super(OAuthLogin, self).web_login(*args, **kw)
 
     @http.route()
