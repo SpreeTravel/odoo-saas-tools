@@ -11,7 +11,9 @@
 							t-att-autofocus="'autofocus' if login and not only_passwords else None">
 							<option value=""></option>
 							<t t-foreach="plans or []" t-as="plan">
-	                        	<option t-att-value="plan.id"><t t-esc="plan.name"/></option>
+                                <t t-if="plan.state == 'confirmed'">
+	                        	 <option t-att-value="plan.id"><t t-esc="plan.name"/></option>
+                                </t>
 	                    	</t>
 	                    </select>
 		            </div>
