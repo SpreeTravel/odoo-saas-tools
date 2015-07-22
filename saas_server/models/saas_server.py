@@ -40,6 +40,7 @@ class SaasServerPlan(models.Model):
     client_ids = fields.One2many('saas_server.client', 'plan_id', 'Clients')
     
     automatic_tenant = fields.Boolean('Automatic Tenant', default=True)
+    redirect_url = fields.Char('Redirect URL')
     template_user = fields.Many2one('res.users', 'Template User')
 
     _order = 'sequence'
