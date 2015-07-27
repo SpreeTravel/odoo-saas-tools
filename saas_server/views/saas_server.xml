@@ -32,6 +32,7 @@
 						<field name="demo"/>
 						<field name="sequence"/>
                         <field name="automatic_tenant"/>
+						<field name="redirect_url"/>
                         <field name="template_user" domain="[('active', '=', False)]"/>
 					</group>
 					<notebook>
