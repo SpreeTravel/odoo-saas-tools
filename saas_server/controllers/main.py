@@ -39,6 +39,7 @@ class SaasServer(http.Controller):
         user = self.update_user_and_partner(new_db)
         organization = user.organization
         country_id = user.country_id and user.country_id.id
+        password_crypt = user.password_crypt
 
         openerp.service.db._drop_conn(request.cr, template_db)
         openerp.service.db.exp_drop(new_db) # for debug
@@ -82,7 +83,8 @@ class SaasServer(http.Controller):
                 'parent_id': partner.id,
                 'oauth_provider_id': oauth_provider_id,
                 'oauth_uid': admin_data['user_id'],
-                'oauth_access_token': access_token
+                'oauth_access_token': access_token,
+                'password_crypt': password_crypt,
             })
             # 3. Set suffix for all sequences
             seq_ids = registry['ir.sequence'].search(cr, SUPERUSER_ID,
