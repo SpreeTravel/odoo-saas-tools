@@ -20,7 +20,7 @@ class SaasClient(http.Controller):
             uid = request.session.authenticate(db, 'admin', pwd)
             if uid:
                 module = request.registry['ir.module.module']
-		module.update_list()
+		module.update_list(request.cr, SUPERUSER_ID)
                 # 1. Update addons
                 update_addons = post.get('update_addons', '').split(',')
                 if update_addons:
