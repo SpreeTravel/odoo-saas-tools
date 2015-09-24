@@ -93,7 +93,7 @@ class OAuthLogin(oauth.OAuthLogin):
                 redirect = '/saas_portal/book_then_signup'
                 kw['redirect'] = '%s?dbname=%s' % (redirect, kw['dbname'])
             else:
-                kw['redirect'] = '/seller/add_product'
+                kw['redirect'] = plan.redirect_url
         return super(OAuthLogin, self).web_auth_signup(*args, **kw)
 
     @http.route()
