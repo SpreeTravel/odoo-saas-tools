@@ -3,6 +3,9 @@ from openerp.addons.web.http import request
 import urllib2
 import simplejson
 
+import logging
+_logger = logging.getLogger(__name__)
+
 
 class SaasPortalConfigWizard(models.TransientModel):
     _name = 'saas_portal.config.settings'
@@ -52,6 +55,7 @@ class SaasPortalConfigWizard(models.TransientModel):
         scheme = request.httprequest.scheme
         for s in saas_server_list:
             url = '{scheme}://{domain}/saas_server/stats'.format(scheme=scheme, domain=s)
+            _logger.info("\n\nRequesting stats at: %s\n", url)
             #req = urllib2.Request(url)
             #req.add_header('content-type', 'application/json')
             data = urllib2.urlopen(url).read()

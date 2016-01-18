@@ -114,14 +114,20 @@ class OAuth2(http.Controller):
             except errors.FatalClientError as e:
                 return self._response_from_error(e)
 
-    @http.route('/oauth2/tokeninfo', type='http', auth='none')
+    @http.route('/oauth2/tokeninfo', type='http', auth='public')
     def tokeninfo(self, **kw):
+        _logger.info("\n\nProcessing: %s\n", kw)
         #domain = request.httprequest.host.split(':')[0]
         domain = request.httprequest.host.replace('.', '_')
+        _logger.info("\n\nAuthenticating: %s", domain)
         request.session.authenticate(domain)
+        _logger.info("Authenticated\n")
         uri, http_method, body, headers = self._extract_params(request, kw)
+        _logger.info("\n\nURI: %s\nMETHOD: %s\nBODY: %s\nHEADERS: %s\n", uri,
+                     http_method, body, headers)
         is_valid, req = self._server.verify_request(uri, http_method, body,
                                                     headers)
+        _logger.info("\n\nIs '%s' valid:? %s", req, is_valid)
         partner = req.user.partner_id
         headers = None
         body = simplejson.dumps({'user_id': partner.id,
@@ -129,6 +135,7 @@ class OAuth2(http.Controller):
                                  'email': partner.email,
                                  'name': partner.name})
         status = 200
+        _logger.info("\n\n<Response: %s> %s", status, body)
         return self._response(headers, body, status)
 
     def get_user(self, kw):

@@ -3,7 +3,7 @@
     <data>
 
 		<template id="login_no_manage_database" inherit_id="web.login_layout" >
-			<xpath expr="//div[@class='oe_single_form_footer']" position="replace">
+			<xpath expr="//div[@class='row']/div/div[last()]" position="replace">
 
 			</xpath>
 		</template>

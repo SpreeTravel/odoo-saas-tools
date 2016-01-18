@@ -50,8 +50,9 @@
 		</template>
 		
 		<template id="saas_server.tenant" inherit_id="website.layout" >
-			<xpath expr="//ul[@role='menu']/li/a[@href='/web']" position="replace">
-				<a href="/saas_server/tenant" role="menuitem">Workspace</a>
+			<xpath expr="//ul[@role='menu']/li[@id='o_logout']" position="before">
+				<li>
+					<a href="/saas_server/tenant" role="menuitem">Workspace</a></li>
 			</xpath>
 		</template>
 		

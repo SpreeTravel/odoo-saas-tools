@@ -31,6 +31,9 @@ class SaasServer(http.Controller):
         access_token = post['access_token']
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
 
+        _logger.info("\n\nAdmin data from: %s\n",
+                     saas_oauth_provider.validation_endpoint)
+
         admin_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
         if admin_data.get("error"):
             raise Exception(admin_data['error'])
