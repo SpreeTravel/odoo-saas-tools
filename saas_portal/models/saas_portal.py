@@ -164,7 +164,8 @@ class SaasConfig(models.TransientModel):
             'update_addons': obj.update_addons or '',
             'install_addons': obj.install_addons or '',
             'uninstall_addons': obj.uninstall_addons or '',
-            'fixes': ','.join(['%s-%s' % (x.model, x.method) for x in obj.fix_ids])
+            'fixes': ','.join(['%s-%s' % (x.model, x.method) for x in obj.fix_ids]),
+            'csrf_token': request.csrf_token(),
         })
 
         dbs = obj.database and obj.database.split(',') or database.get_market_dbs(False)
