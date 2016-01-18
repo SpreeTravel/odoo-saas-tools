@@ -158,8 +158,8 @@ class SaasConfig(models.TransientModel):
 
     def upgrade_database(self, cr, uid, obj, context=None):
         res = {}
-        # scheme = request.httprequest.scheme
-        scheme = 'https'
+        scheme = request.httprequest.scheme
+        # scheme = 'https'
         payload = simplejson.dumps({
             'update_addons': obj.update_addons or '',
             'install_addons': obj.install_addons or '',
@@ -170,24 +170,10 @@ class SaasConfig(models.TransientModel):
 
         dbs = obj.database and obj.database.split(',') or database.get_market_dbs(False)
         for db in dbs:
-            status_code = 500
-            try:
-                url = '{scheme}://{domain}/saas_client/upgrade_database'.format(scheme=scheme, domain=db.replace('_', '.'))
-                r = requests.post(url, data=payload)
-                status_code = r.status_code
-            except requests.ConnectionError as e:
-                _logger.error(e)
-                status_code = 111
-                scheme = 'http'
-                try:
-                    url = '{scheme}://{domain}/saas_client/upgrade_database'.format(
-                        scheme=scheme, domain=db.replace('_', '.'))
-                    r = requests.post(url, data=payload)
-                    status_code = r.status_code
-                except Exception as e:
-                    _logger.error(e)
-                    status_code = 500
-            res[db] = status_code
+            url = '{scheme}://{domain}/saas_client/upgrade_database'.format(scheme=scheme, domain=db.replace('_', '.'))
+            _logger.info("\n\n[POST] %s : %s\n", url, payload)
+            r = requests.post(url, data=payload)
+            res[db] = r.status_code
         self.write(cr, uid, obj.id, {'description': str(res)})
         return {
             'type': 'ir.actions.act_window',
