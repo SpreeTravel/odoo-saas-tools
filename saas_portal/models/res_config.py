@@ -64,3 +64,14 @@ class SaasPortalConfigWizard(models.TransientModel):
                 else:
                     self.pool['oauth.application'].write(cr, uid, id, r)
         return None
+
+
+class SaasPortalDatabaseLogin(models.Model):
+    _name = 'saas_portal.db.login'
+
+    login = fields.Char(string='User email')
+    db_name = fields.Char(string='Custom DB name')
+
+    _sql_constraints = [
+        ('db_uniq', 'UNIQUE(db_name)', 'Database name already taken')
+    ]
