@@ -1,6 +1,6 @@
 {
     'name': 'SaaS Server',
-    'version': '1.0.0',
+    'version': '1.0.1',
     'author': 'Ivan Yelizariev',
     'category': 'SaaS',
     'website': 'https://it-projects.info',

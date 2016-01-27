@@ -120,35 +120,52 @@ class SaasServerClient(models.Model):
         db_list = database.get_market_dbs(with_templates=False)
         _logger.info("Bases de datos: %s", str(db_list))
         try:
-            client_list.remove(server_db)
+            db_list.remove(server_db)
         except:
             pass
 
         res = []
         for db in db_list:
             registry = openerp.modules.registry.RegistryManager.get(db)
+
             with registry.cursor() as db_cr:
-                client_id = registry['ir.config_parameter'].get_param(db_cr,
-                                                SUPERUSER_ID, 'database.uuid')
-                users = registry['res.users'].search(db_cr, SUPERUSER_ID,
-                                                     [('share', '=', False)])
-                users_len = len(users)
-                data_dir = openerp.tools.config['data_dir']
+                data = {'name': db}
+                try:
+                    client_id = registry['ir.config_parameter'].get_param(db_cr,
+                                                    SUPERUSER_ID, 'database.uuid')
+                    data.update({'client_id': client_id})
+                except Exception as e:
+                    data.update({'client_id': 'Unidentified client'})
+                    _logger.error(e)
 
-                file_storage = get_size('%s/filestore/%s' % (data_dir, db))
-                file_storage = int(file_storage / (1024 * 1024))
+                try:
+                    users = registry['res.users'].search(db_cr, SUPERUSER_ID,
+                                                         [('share', '=', False)])
+                    users_len = len(users)
+                    data.update({"users_len": users_len})
+                except Exception as e:
+                    data.update({"users_len": -1})
+                    _logger.error(e)
 
-                db_cr.execute("select pg_database_size('%s')" % db)
-                db_storage = db_cr.fetchone()[0]
-                db_storage = int(db_storage / (1024 * 1024))
+                try:
+                    data_dir = openerp.tools.config['data_dir']
 
-                data = {
-                    'name': db,
-                    'client_id': client_id,
-                    'users_len': users_len,
-                    'file_storage': file_storage,
-                    'db_storage': db_storage,
-                }
+                    file_storage = get_size('%s/filestore/%s' % (data_dir, db))
+                    file_storage = int(file_storage / (1024 * 1024))
+                    data.update({"file_storage": file_storage})
+                except Exception as e:
+                    data.update({"file_storage": -1})
+                    _logger.error(e)
+
+                try:
+                    db_cr.execute("select pg_database_size('%s')" % db)
+                    db_storage = db_cr.fetchone()[0]
+                    db_storage = int(db_storage / (1024 * 1024))
+                    data.update({"db_storage": db_storage})
+                except Exception as e:
+                    data.update({"db_storage": -1})
+                    _logger.error(e)
+
                 oid = self.search(cr, uid, [('name', '=', db)])
                 if not oid:
                     self.create(cr, uid, data)
