@@ -35,5 +35,43 @@
         <menuitem id="menu_saas_portal_configuration" parent="base.menu_config"
             sequence="90" action="action_saas_portal_configuration"/>
 
+        <record id="view_custom_dbname_tree" model="ir.ui.view">
+            <field name="name">saas_portal.db.login.tree</field>
+            <field name="model">saas_portal.db.login</field>
+            <field name="priority">4</field>
+            <field name="arch" type="xml">
+                <tree string="Registered DB names">
+                    <field name="login"/>
+                    <field name="db_name"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_custom_dbname_form" model="ir.ui.view">
+            <field name="name">saas_portal.db.login.form</field>
+            <field name="model">saas_portal.db.login</field>
+            <field name="arch" type="xml">
+                <form string="Register new DB name">
+                    <group>
+                        <group>
+                            <field name="login"/>
+                            <field name="db_name"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_custom_dbname" model="ir.actions.act_window">
+            <field name="name">Custom DB names</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">saas_portal.db.login</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem action="action_custom_dbname" id="menu_custom_dbname" parent="menu_saas"
+                  sequence="6"/>
     </data>
 </openerp>
