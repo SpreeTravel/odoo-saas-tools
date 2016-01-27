@@ -73,5 +73,6 @@ class SaasPortalDatabaseLogin(models.Model):
     db_name = fields.Char(string='Custom DB name')
 
     _sql_constraints = [
-        ('db_uniq', 'UNIQUE(db_name)', 'Database name already taken')
+        ('db_uniq', 'UNIQUE(db_name)', 'Database name already taken'),
+        ('login_uniq', 'UNIQUE(login)', 'Login already used'),
     ]
