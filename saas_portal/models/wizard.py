@@ -16,10 +16,14 @@ class SaasConfig(models.TransientModel):
     _name = 'saas.config'
 
     def _default_database_id(self):
-        return self._context.get('active_id')
+        model = self._context.get('active_model')
+        # TODO: Mejorar esto, buscar con quien se realciona server_id
+        if model == 'saas_portal.client':
+            return self._context.get('active_id')
+        return False
 
     action = fields.Selection([('edit', 'Edit'), ('upgrade', 'Configure'), ('delete', 'Delete')],
-                                'Action')
+                              'Action')
     database_id = fields.Many2one('saas_portal.client', string='Database', default=_default_database_id)
     server_id = fields.Many2one('saas_portal.server', string='Server', related='database_id.server_id', readonly=True)
     update_addons = fields.Char('Update Addons', size=256)
@@ -55,19 +59,32 @@ class SaasConfig(models.TransientModel):
         state = {
             'data': payload,
         }
-        url = self.server_id._request_server(
-            path='/saas_server/upgrade_database',
-            client_id=self.database_id.client_id,
-            state=state,
-        )[0]
-        res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
-        if res.ok != True:
+        sass_portal_server = self.env.context.get('sass_portal_server', False)
+        if sass_portal_server:
+            last = None
+            sass_server = self.env['saas_portal.server']
+            server = sass_server.search([('id', '=', sass_portal_server)])
+            if server:
+                self.server_id = server.id
+                for client in server.client_ids.search([('state', '=', 'open')]):
+                    last = self.server_id._request_server(path='/saas_server/upgrade_database',
+                                                          client_id=client.client_id, state=state)[0]
+            url = last
+        else:
+            url = self.server_id._request_server(path='/saas_server/upgrade_database',
+                                                 client_id=self.database_id.client_id, state=state)[0]
+        if url:
+            res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
+        else:
+            res = None
+        if res and res.ok != True:
             msg = """Status Code - %s
 Reason - %s
 URL - %s
             """ % (res.status_code, res.reason, res.url)
             raise Warning(msg)
-        obj.write({'description': res.text})
+        if res:
+            obj.write({'description': res.text})
         return {
             'type': 'ir.actions.act_window',
             'view_type': 'form',
@@ -85,6 +102,7 @@ class SaasConfigFix(models.TransientModel):
     method = fields.Char('Method', required=1, size=64)
     config_id = fields.Many2one('saas.config', 'Config')
 
+
 class SaasConfigParam(models.TransientModel):
     _name = 'saas.config.param'
 
@@ -96,6 +114,7 @@ class SaasConfigParam(models.TransientModel):
     key = fields.Selection(selection=_get_keys, string='Key', required=1, size=64)
     value = fields.Char('Value', required=1, size=64)
     config_id = fields.Many2one('saas.config', 'Config')
+
 
 class SaasPortalCreateClient(models.TransientModel):
     _name = 'saas_portal.create_client'
@@ -138,7 +157,7 @@ class SaasPortalDuplicateClient(models.TransientModel):
             client = self.env['saas_portal.client'].browse(client_id)
             return client.partner_id
         return ''
-    
+
     def _default_expiration(self):
         client_id = self._default_client_id()
         if client_id:

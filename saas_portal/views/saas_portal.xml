@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <menuitem name="SaaS" id="menu_base_saas" sequence="30" />
-        <menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1" />
+        <menuitem name="SaaS" id="menu_base_saas" sequence="30"/>
+        <menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1"/>
 
         <!-- Database -->
 
-       <record id="view_databases_form" model="ir.ui.view">
+        <record id="view_databases_form" model="ir.ui.view">
             <field name="name">saas_portal.databases.form</field>
             <field name="model">saas_portal.database</field>
             <field name="arch" type="xml">
                 <form string="plans">
                     <sheet>
                         <group>
-                           <field name="name" />
-                           <field name="state" />
-                           <field name="client_id" readonly="1" />
+                            <field name="name"/>
+                            <field name="state"/>
+                            <field name="client_id" readonly="1"/>
                         </group>
                     </sheet>
                 </form>
@@ -37,10 +37,13 @@
                     <field name="file_storage"/>
                     <field name="db_storage"/>
                     <field name="expiration_datetime"/>
-                    <button name="edit_database" type="object" icon="gtk-connect" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"/>
-                    <button name="upgrade_database" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" />
-                    <button name="delete_database" type="object" attrs="{'invisible':[('state', 'not in', ['pending'])]}" icon="gtk-delete" 
-                    confirm="Are you sure to delete this database?"/>
+                    <button name="edit_database" type="object" icon="gtk-connect"
+                            attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"/>
+                    <button name="upgrade_database" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object"
+                            icon="gtk-execute"/>
+                    <button name="delete_database" type="object"
+                            attrs="{'invisible':[('state', 'not in', ['pending'])]}" icon="gtk-delete"
+                            confirm="Are you sure to delete this database?"/>
                 </tree>
             </field>
         </record>
@@ -53,39 +56,44 @@
                 <form string="Clients">
                     <field name="expired" invisible="1"/>
                     <header>
-                        <button string="Log in" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-connect" class="oe_highlight"/>
-                        <button string="Configure" name="upgrade_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
-                        <button string="Delete" name="delete_database" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" 
-                        confirm="Are you sure to delete this database?"/>
+                        <button string="Log in" name="edit_database" type="object"
+                                attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-connect"
+                                class="oe_highlight"/>
+                        <button string="Configure" name="upgrade_database" type="object"
+                                attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute"/>
+                        <button string="Delete" name="delete_database" type="object"
+                                attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete"
+                                confirm="Are you sure to delete this database?"/>
                         <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh"/>
-                        <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
+                        <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted"
+                               clickable="False"/>
                     </header>
                     <sheet>
-                    <group>
                         <group>
-                            <field name="client_id"/>
-                            <field name="name"/>
-                            <field name="plan_id"/>
-                            <field name="partner_id"/>
-                            <field name="users_len"/>
-                            <field name="file_storage"/>
-                            <field name="db_storage"/>
-                            <field name="server_id"/>
-                            <field name="expiration_datetime"/>
+                            <group>
+                                <field name="client_id"/>
+                                <field name="name"/>
+                                <field name="plan_id"/>
+                                <field name="partner_id"/>
+                                <field name="users_len"/>
+                                <field name="file_storage"/>
+                                <field name="db_storage"/>
+                                <field name="server_id"/>
+                                <field name="expiration_datetime"/>
+                            </group>
                         </group>
-                    </group>
-                    <notebook>
-                        <!--
-                        <page string="OAuth Users">
-                            <field name="token_ids" readonly="1">
-                                <tree>
-                                    <field name="user_id"/>
-                                    <field name="expires"/>
-                                </tree>
-                            </field>
-                        </page>
-                        -->
-                    </notebook>
+                        <notebook>
+                            <!--
+                            <page string="OAuth Users">
+                                <field name="token_ids" readonly="1">
+                                    <tree>
+                                        <field name="user_id"/>
+                                        <field name="expires"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            -->
+                        </notebook>
                     </sheet>
                     <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
@@ -148,29 +156,31 @@
                         <button string="Create Server" name="%(action_create_server
 )d" type="action" class="oe_highlight" states="draft"/>
                         -->
-                        <button string="Open Server" name="action_redirect_to_server" type="object" icon="gtk-connect" class="oe_highlight"/>
+                        <button string="Open Server" name="action_redirect_to_server" type="object" icon="gtk-connect"
+                                class="oe_highlight"/>
                         <button name="action_sync_server" type="object" string="Sync server" icon="gtk-refresh"/>
+                        <button name="action_update_clients" type="object" string="Update Clients" icon="gtk-refresh"/>
                     </header>
                     <sheet>
-                    <group>
                         <group>
-                            <field name="name"/>
-                            <field name="client_id"/>
-                            <field name="active"/>
-                            <field name="request_scheme"/>
-			    <field name="verify_ssl" attrs="{'invisible': [('request_scheme', '!=', 'https')]}"/>
-                            <field name="request_port"/>
+                            <group>
+                                <field name="name"/>
+                                <field name="client_id"/>
+                                <field name="active"/>
+                                <field name="request_scheme"/>
+                                <field name="verify_ssl" attrs="{'invisible': [('request_scheme', '!=', 'https')]}"/>
+                                <field name="request_port"/>
+                            </group>
                         </group>
-                    </group>
-                    <field name="client_ids" readonly="1">
-                        <tree>
-                            <field name="name"/>
-                            <field name="state"/>
-                            <field name="users_len"/>
-                            <field name="file_storage"/>
-                            <field name="db_storage"/>
-                        </tree>
-                    </field>
+                        <field name="client_ids" readonly="1">
+                            <tree>
+                                <field name="name"/>
+                                <field name="state"/>
+                                <field name="users_len"/>
+                                <field name="file_storage"/>
+                                <field name="db_storage"/>
+                            </tree>
+                        </field>
                     </sheet>
                     <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
@@ -201,11 +211,11 @@
                     <field name="sequence" invisible="1"/>
                     <field name="name"/>
                     <field name="template_id"/>
-                    <field name="state" />
-                    <button name="create_template" type="object" states="draft" icon="gtk-apply" />
-                    <button name="edit_template" type="object" states="confirmed" icon="gtk-edit" />
+                    <field name="state"/>
+                    <button name="create_template" type="object" states="draft" icon="gtk-apply"/>
+                    <button name="edit_template" type="object" states="confirmed" icon="gtk-edit"/>
                     <!--<button name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />-->
-                    <button name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
+                    <button name="delete_template" type="object" states="confirmed" icon="gtk-cancel"/>
                 </tree>
             </field>
         </record>
@@ -217,21 +227,28 @@
             <field name="arch" type="xml">
                 <form string="plans">
                     <header>
-                        <button string="Create template DB" name="create_template" type="object" attrs="{'invisible':['|', '|', ('state','not in', ['draft']), ('server_id','=',False), ('template_id','=',False)]}" icon="gtk-apply" class="oe_highlight"/>
-                        <button string="Log in to template DB" name="edit_template" type="object" states="confirmed" icon="gtk-edit" class="oe_highlight"/>
+                        <button string="Create template DB" name="create_template" type="object"
+                                attrs="{'invisible':['|', '|', ('state','not in', ['draft']), ('server_id','=',False), ('template_id','=',False)]}"
+                                icon="gtk-apply" class="oe_highlight"/>
+                        <button string="Log in to template DB" name="edit_template" type="object" states="confirmed"
+                                icon="gtk-edit" class="oe_highlight"/>
                         <!--<button string="Configure template DB" name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />-->
-                        <button string="Delete template DB" name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
+                        <button string="Delete template DB" name="delete_template" type="object" states="confirmed"
+                                icon="gtk-cancel"/>
                         <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh"/>
-                        <button string="Create Client" type="action" name="%(action_create_client)d" states="confirmed"/>
+                        <button string="Create Client" type="action" name="%(action_create_client)d"
+                                states="confirmed"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
-                    	<div class="oe_left" style="width: 500px;">
+                        <div class="oe_left" style="width: 500px;">
                             <field name="logo" widget="image" class="oe_avatar oe_left"/>
                             <div class="oe_title" style="width: 390px;">
                                 <label class="oe_edit_only" for="name" string="Name"/>
-                                <h1><field name="name" class="oe_inline"/></h1>
-								<field name="summary"/>
+                                <h1>
+                                    <field name="name" class="oe_inline"/>
+                                </h1>
+                                <field name="summary"/>
                             </div>
                         </div>
                         <group>
@@ -276,44 +293,46 @@
             <field name="model">saas.config</field>
             <field name="arch" type="xml">
                 <form string="Configure Database" create="false" edit="false" delete="false">
-                     <group>
-                        <field name="id" invisible="1" />
+                    <group>
+                        <field name="id" invisible="1"/>
                         <field name="action" readonly="1"/>
-                        <field name="database_id" />
+                        <field name="database_id" invisible="context.get('sass_portal_server', False)"/>
                         <field name="server_id"/>
-                     </group>
-                     <notebook>
-                     <page string="Result"  attrs="{'invisible': [('id', '=', False)]}">
-                        <field name="description" />
-                     </page>
+                    </group>
+                    <notebook>
+                        <page string="Result" attrs="{'invisible': [('id', '=', False)]}">
+                            <field name="description"/>
+                        </page>
 
-                     <page string="Addons"  attrs="{'invisible': [('action', '!=', 'upgrade')]}">
-                         <p>Comma-separated list of addons to Update, Install or Uninstall</p>
-                         <group>
-                             <field name="update_addons"/>
-                             <field name="install_addons"/>
-                             <field name="uninstall_addons"/>
-                         </group>
-                     </page>
-                     <page string="Parameters" attrs="{'invisible': [('action', '!=', 'upgrade')]}">
-                         <field name="param_ids" colspan="4" >
-                             <tree editable="bottom">
-                                 <field name="key" />
-                                 <field name="value" />
-                             </tree>
-                         </field>
-                     </page>
-                     <page string="Commands" attrs="{'invisible': [('action', '!=', 'upgrade')]}">
-                         <p>This sections allows execute special commands on client. Ask developers for instructions.</p>
-                         <field name="fix_ids" colspan="4" >
-                             <tree editable="bottom">
-                                 <field name="model" />
-                                 <field name="method" />
-                             </tree>
-                         </field>
-                     </page>
-                     </notebook>
-                     <footer>
+                        <page string="Addons" attrs="{'invisible': [('action', '!=', 'upgrade')]}">
+                            <p>Comma-separated list of addons to Update, Install or Uninstall</p>
+                            <group>
+                                <field name="update_addons"/>
+                                <field name="install_addons"/>
+                                <field name="uninstall_addons"/>
+                            </group>
+                        </page>
+                        <page string="Parameters" attrs="{'invisible': [('action', '!=', 'upgrade')]}">
+                            <field name="param_ids" colspan="4">
+                                <tree editable="bottom">
+                                    <field name="key"/>
+                                    <field name="value"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Commands" attrs="{'invisible': [('action', '!=', 'upgrade')]}">
+                            <p>This sections allows execute special commands on client. Ask developers for
+                                instructions.
+                            </p>
+                            <field name="fix_ids" colspan="4">
+                                <tree editable="bottom">
+                                    <field name="model"/>
+                                    <field name="method"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <footer>
                         <button name="execute_action" string="Execute" type="object" class="oe_highlight"/>
                         or
                         <button string="Close" class="oe_link" special="cancel"/>
@@ -350,20 +369,20 @@
             <field name="model">saas.config</field>
             <field name="value_unpickle" eval="'ir.actions.act_window,'+str(action_updb)"/>
         </record>
-        
-         <!-- Templates -->
+
+        <!-- Templates -->
         <record id="view_databases_tree" model="ir.ui.view">
             <field name="name">saas_portal.databases.tree</field>
             <field name="model">saas_portal.database</field>
             <field name="arch" type="xml">
                 <tree string="Plans">
-                     <field name="name" />
-                     <field name="state" />
-                     <field name="client_id" />
+                    <field name="name"/>
+                    <field name="state"/>
+                    <field name="client_id"/>
                 </tree>
             </field>
         </record>
-        
+
         <record id="view_databases_filter" model="ir.ui.view">
             <field name="name">saas_portal.database.select</field>
             <field name="model">saas_portal.database</field>
@@ -374,7 +393,7 @@
                 </search>
             </field>
         </record>
-        
+
         <record id="action_templates" model="ir.actions.act_window">
             <field name="name">Templates</field>
             <field name="type">ir.actions.act_window</field>
@@ -384,7 +403,8 @@
             <field name="context">{'search_default_template': 1}</field>
         </record>
 
-        <menuitem action="action_templates" id="menu_templates" parent="menu_saas" sequence="40" groups="base.group_no_one"/>
+        <menuitem action="action_templates" id="menu_templates" parent="menu_saas" sequence="40"
+                  groups="base.group_no_one"/>
 
     </data>
 </openerp>

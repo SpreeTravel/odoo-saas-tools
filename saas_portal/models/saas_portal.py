@@ -17,6 +17,7 @@ import requests
 import random
 
 import logging
+
 _logger = logging.getLogger(__name__)
 
 
@@ -33,7 +34,8 @@ class SaasPortalServer(models.Model):
     sequence = fields.Integer('Sequence')
     active = fields.Boolean('Active', default=True)
     request_scheme = fields.Selection([('http', 'http'), ('https', 'https')], 'Scheme', default='http', required=True)
-    verify_ssl = fields.Boolean('Verify SSL', default=True, help="verify SSL certificates for HTTPS requests, just like a web browser")
+    verify_ssl = fields.Boolean('Verify SSL', default=True,
+                                help="verify SSL certificates for HTTPS requests, just like a web browser")
     request_port = fields.Integer('Request Port', default=80)
     client_ids = fields.One2many('saas_portal.client', 'server_id', string='Clients')
 
@@ -45,7 +47,7 @@ class SaasPortalServer(models.Model):
 
     @api.model
     def create_access_token(self, oauth_application_id):
-        expires = datetime.now() + timedelta(seconds=60*60)
+        expires = datetime.now() + timedelta(seconds=60 * 60)
         vals = {
             'user_id': self.env.user.id,
             'scope': 'userinfo',
@@ -65,7 +67,8 @@ class SaasPortalServer(models.Model):
         params = {
             'scope': scope,
             'state': simplejson.dumps(state),
-            'redirect_uri': '{scheme}://{saas_server}:{port}{path}'.format(scheme=scheme, port=port, saas_server=self.name, path=path),
+            'redirect_uri': '{scheme}://{saas_server}:{port}{path}'.format(scheme=scheme, port=port,
+                                                                           saas_server=self.name, path=path),
             'response_type': 'token',
             'client_id': client_id,
         }
@@ -82,20 +85,23 @@ class SaasPortalServer(models.Model):
         scheme = scheme or self.request_scheme
         port = port or self.request_port
         params = self._request_params(**kwargs)[0]
-        access_token = self.env['oauth.access_token'].sudo().search([('application_id', '=', self.oauth_application_id.id)], order='id DESC', limit=1)
+        access_token = self.env['oauth.access_token'].sudo().search(
+            [('application_id', '=', self.oauth_application_id.id)], order='id DESC', limit=1)
         access_token = access_token[0].token
         params.update({
             'token_type': 'Bearer',
             'access_token': access_token,
             'expires_in': 3600,
         })
-        url = '{scheme}://{saas_server}:{port}{path}?{params}'.format(scheme=scheme, saas_server=self.name, port=port, path=path, params=werkzeug.url_encode(params))
+        url = '{scheme}://{saas_server}:{port}{path}?{params}'.format(scheme=scheme, saas_server=self.name, port=port,
+                                                                      path=path, params=werkzeug.url_encode(params))
         return url
 
     @api.multi
     def action_redirect_to_server(self):
         r = self[0]
-        url = '{scheme}://{saas_server}:{port}{path}'.format(scheme=r.request_scheme, saas_server=r.name, port=r.request_port, path='/web')
+        url = '{scheme}://{saas_server}:{port}{path}'.format(scheme=r.request_scheme, saas_server=r.name,
+                                                             port=r.request_port, path='/web')
         return {
             'type': 'ir.actions.act_url',
             'target': 'new',
@@ -106,6 +112,21 @@ class SaasPortalServer(models.Model):
     @api.model
     def action_sync_server_all(self):
         self.search([]).action_sync_server()
+
+    @api.multi
+    def action_update_clients(self):
+        obj = self[0]
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'saas.config',
+            'target': 'new',
+            'context': {
+                'default_action': 'upgrade',
+                'sass_portal_server': obj.id
+            }
+        }
 
     @api.one
     def action_sync_server(self):
@@ -119,7 +140,7 @@ class SaasPortalServer(models.Model):
             msg = """Status Code - %s
 Reason - %s
 URL - %s
-            """ % (res.status_code, res.reason, res.url)            
+            """ % (res.status_code, res.reason, res.url)
             raise Warning(msg)
         data = simplejson.loads(res.text)
         for r in data:
@@ -174,10 +195,12 @@ class SaasPortalPlan(models.Model):
 
     _order = 'sequence'
 
-    dbname_template = fields.Char('DB Names', help='Template for db name. Use %i for numbering. Ignore if you use manually created db names', placeholder='crm-%i.odoo.com')
+    dbname_template = fields.Char('DB Names',
+                                  help='Template for db name. Use %i for numbering. Ignore if you use manually created db names',
+                                  placeholder='crm-%i.odoo.com')
     server_id = fields.Many2one('saas_portal.server', string='SaaS Server',
                                 help='User this saas server or choose random')
-    
+
     website_description = fields.Text('Website description')
     logo = fields.Binary('Logo')
 
@@ -238,7 +261,7 @@ class SaasPortalPlan(models.Model):
                               port=port,
                               state=state,
                               client_id=client_id,
-                              scope=scope,)[0]
+                              scope=scope, )[0]
         return url
 
     @api.one
@@ -252,7 +275,7 @@ class SaasPortalPlan(models.Model):
 
     @api.multi
     def create_template(self):
-        assert len(self)==1, 'This method is applied only for single record'
+        assert len(self) == 1, 'This method is applied only for single record'
         plan = self[0]
         state = {
             'd': plan.template_id.name,
@@ -336,13 +359,13 @@ class SaasPortalDatabase(models.Model):
     name = fields.Char('Database name', readonly=False)
     oauth_application_id = fields.Many2one('oauth.application', 'OAuth Application', required=True, ondelete='cascade')
     server_id = fields.Many2one('saas_portal.server', string='Server', readonly=True)
-    state = fields.Selection([('draft','New'),
-                              ('open','In Progress'),
+    state = fields.Selection([('draft', 'New'),
+                              ('open', 'In Progress'),
                               ('cancelled', 'Cancelled'),
-                              ('pending','Pending'),
-                              ('deleted','Deleted'),
-                              ('template','Template'),
-                          ],
+                              ('pending', 'Pending'),
+                              ('deleted', 'Deleted'),
+                              ('template', 'Template'),
+                              ],
                              'State', default='draft', track_visibility='onchange')
 
     @api.one
@@ -388,7 +411,9 @@ class SaasPortalDatabase(models.Model):
         }
         if force_delete:
             state['force_delete'] = 1
-        url = self.server_id._request_server(path='/saas_server/delete_database', state=state, client_id=self.client_id)[0]
+        url = \
+            self.server_id._request_server(path='/saas_server/delete_database', state=state, client_id=self.client_id)[
+                0]
         res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
         _logger.info('delete database: %s', res.text)
         if res.status_code != 500:
@@ -404,8 +429,8 @@ class SaasPortalDatabase(models.Model):
             'res_model': 'saas.config',
             'target': 'new',
             'context': {
-               'default_action': 'upgrade',
-               'default_database': obj.name
+                'default_action': 'upgrade',
+                'default_database': obj.name
             }
         }
 
@@ -435,12 +460,12 @@ class SaasPortalClient(models.Model):
             tk_ids = token_model.search(cr, uid, to_search1, context=context)
             if tk_ids:
                 token_model.unlink(cr, uid, tk_ids)
-            # TODO: it seems we don't need stuff below
-            #to_search2 = [('database', '=', obj.name)]
-            #user_ids = user_model.search(cr, uid, to_search2, context=context)
-            #if user_ids:
-            #    user_model.unlink(cr, uid, user_ids)
-            #openerp.service.db.exp_drop(obj.name)
+                # TODO: it seems we don't need stuff below
+                # to_search2 = [('database', '=', obj.name)]
+                # user_ids = user_model.search(cr, uid, to_search2, context=context)
+                # if user_ids:
+                #    user_model.unlink(cr, uid, user_ids)
+                # openerp.service.db.exp_drop(obj.name)
         return super(SaasPortalClient, self).unlink(cr, uid, ids, context)
 
     @api.one
@@ -472,12 +497,12 @@ class SaasPortalClient(models.Model):
             'r': '%s://%s:%s/web' % (scheme, port, client.name),
         }
         state.update({'db_template': self.name,
-                      'disable_mail_server' : True})
+                      'disable_mail_server': True})
         scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
         url = server._request(path='/saas_server/new_database',
                               scheme=scheme,
                               port=port,
                               state=state,
                               client_id=client_id,
-                              scope=scope,)[0]
+                              scope=scope, )[0]
         return url
