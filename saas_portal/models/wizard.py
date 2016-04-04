@@ -60,8 +60,8 @@ class SaasConfig(models.TransientModel):
             'data': payload,
         }
         sass_portal_server = self.env.context.get('sass_portal_server', False)
+        last = None
         if sass_portal_server:
-            last = None
             sass_server = self.env['saas_portal.server']
             server = sass_server.search([('id', '=', sass_portal_server)])
             if server:
@@ -69,11 +69,13 @@ class SaasConfig(models.TransientModel):
                 for client in server.client_ids.search([('state', '=', 'open')]):
                     last = self.server_id._request_server(path='/saas_server/upgrade_database',
                                                           client_id=client.client_id, state=state)[0]
+                    res = requests.get(last,
+                                       verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
             url = last
         else:
             url = self.server_id._request_server(path='/saas_server/upgrade_database',
                                                  client_id=self.database_id.client_id, state=state)[0]
-        if url:
+        if not last and url:
             res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
         else:
             res = None
