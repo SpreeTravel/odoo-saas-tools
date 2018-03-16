@@ -36,12 +36,12 @@
                         <field name="template_user" domain="[('active', '=', False)]"/>
 					</group>
 					<notebook>
-						<page string="Required Addons" >
+						<!--<page string="Required Addons" >
 							<field name="required_addons_ids" nolabel="1" />
 						</page>
 						<page string="Optional Addons" >
 							<field name="optional_addons_ids" nolabel="1" />
-						</page>
+						</page>-->
 					</notebook>
 				</form>
             </field>
@@ -68,6 +68,18 @@
         </record>
 
 		<menuitem action="action_upgrade_clients" id="menu_upgrade_clients" parent="saas_portal.menu_saas" sequence="8" groups="base.group_system"/>
+
+        <record id="view_clients_tree" model="ir.ui.view">
+            <field name="name">saas_portal.clients.tree.inherit</field>
+            <field name="model">oauth.application</field>
+            <field name="priority">4</field>
+            <field name="inherit_id" ref="saas_portal.view_clients_tree"/>
+            <field name="arch" type="xml">
+                <field name="db_storage" position="after">
+                    <field name="total_storage"/>
+                </field>
+            </field>
+        </record>
 
     </data>
 </openerp>
